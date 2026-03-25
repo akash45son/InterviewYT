@@ -15,8 +15,12 @@ export const useAuth = () => {
         try {
             const data = await login({ email, password })
             setUser(data.user)
+            if (data?.token) {
+                localStorage.setItem("token", data.token)
+            }
+            return true
         } catch (err) {
-
+            return false
         } finally {
             setLoading(false)
         }
@@ -27,8 +31,12 @@ export const useAuth = () => {
         try {
             const data = await register({ username, email, password })
             setUser(data.user)
+            if (data?.token) {
+                localStorage.setItem("token", data.token)
+            }
+            return true
         } catch (err) {
-
+            return false
         } finally {
             setLoading(false)
         }
@@ -37,10 +45,12 @@ export const useAuth = () => {
     const handleLogout = async () => {
         setLoading(true)
         try {
-            const data = await logout()
+            await logout()
             setUser(null)
+            localStorage.removeItem("token")
+            return true
         } catch (err) {
-
+            return false
         } finally {
             setLoading(false)
         }
@@ -49,11 +59,22 @@ export const useAuth = () => {
     useEffect(() => {
 
         const getAndSetUser = async () => {
+            const token = localStorage.getItem("token")
+
+            if (!token) {
+                setUser(null)
+                setLoading(false)
+                return
+            }
+
             try {
 
                 const data = await getMe()
                 setUser(data.user)
-            } catch (err) { } finally {
+            } catch (err) {
+                setUser(null)
+                localStorage.removeItem("token")
+            } finally {
                 setLoading(false)
             }
         }

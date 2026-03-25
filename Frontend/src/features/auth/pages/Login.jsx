@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import { useNavigate, Link } from 'react-router'
 import "../auth.form.scss"
 import { useAuth } from '../hooks/useAuth'
@@ -11,10 +11,19 @@ const Login = () => {
     const [ email, setEmail ] = useState("")
     const [ password, setPassword ] = useState("")
 
+    useEffect(() => {
+        const token = localStorage.getItem("token")
+        if (token) {
+            navigate('/')
+        }
+    }, [navigate])
+
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await handleLogin({email,password})
-        navigate('/')
+        const isLoggedIn = await handleLogin({email,password})
+        if (isLoggedIn) {
+            navigate('/')
+        }
     }
 
     if(loading){
