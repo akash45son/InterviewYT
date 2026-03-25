@@ -3,11 +3,10 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const tokenBlacklistModel = require("../models/blacklist.model")
 
-const isProduction = process.env.NODE_ENV === "production"
 const cookieOptions = {
     httpOnly: true,
-    sameSite: isProduction ? "none" : "lax",
-    secure: isProduction,
+    sameSite: "none",
+    secure: true,
     maxAge: 24 * 60 * 60 * 1000
 }
 
@@ -161,8 +160,8 @@ async function logoutUserController(req, res) {
         // Clear the token cookie
         res.clearCookie("token", {
             httpOnly: true,
-            sameSite: isProduction ? "none" : "lax",
-            secure: isProduction
+            sameSite: "none",
+            secure: true
         })
 
         return res.status(200).json({

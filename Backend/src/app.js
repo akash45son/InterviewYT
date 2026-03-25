@@ -4,7 +4,7 @@ const cors = require("cors")
 
 const app = express()
 
-const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173"
+const frontendUrl = process.env.FRONTEND_URL || "https://interview-yt.vercel.app"
 
 app.use(express.json())
 app.use(cookieParser())
