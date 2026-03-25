@@ -1,10 +1,4 @@
-import axios from "axios"
-
-
-const api = axios.create({
-    baseURL: "https://interviewyt.onrender.com",
-    withCredentials: true
-})
+import api from "../../../services/api.client"
 
 export async function register({ username, email, password }) {
 
