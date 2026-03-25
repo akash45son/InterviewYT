@@ -4,12 +4,21 @@ const cors = require("cors")
 
 const app = express()
 
-const frontendUrl = process.env.FRONTEND_URL || "https://interview-yt.vercel.app"
-
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    origin: frontendUrl,
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true)
+
+        if (
+            origin.includes("localhost") ||
+            origin.endsWith(".vercel.app")
+        ) {
+            callback(null, true)
+        } else {
+            callback(new Error("Not allowed by CORS: " + origin))
+        }
+    },
     credentials: true
 }))
 
