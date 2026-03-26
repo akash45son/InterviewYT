@@ -1,20 +1,17 @@
 @use "sass:color";
 
-// ── Shared Variables (mirrors home.scss theme) ────────────────────────────────
-$bg-page: #0d1117;
-$bg-card: #161b22;
-$bg-panel: #1c2230;
-$bg-input: #1e2535;
-$border-color: #2a3348;
-$text-primary: #e6edf3;
-$text-muted: #7d8590;
-$accent: #ff2d78;
-$font-stack: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$bg-page: #f5f1e8;
+$bg-card: rgba(255, 255, 255, 0.8);
+$bg-panel: rgba(255, 255, 255, 0.72);
+$border-color: #d3dfdb;
+$text-primary: #1f2d3d;
+$text-muted: #5f6f7f;
+$accent: #176b5f;
+$font-stack: 'Plus Jakarta Sans', sans-serif;
 
-// severity palette
-$severity-high: #ff4d4d;
-$severity-medium: #f5a623;
-$severity-low: #3fb950;
+$severity-high: #b42318;
+$severity-medium: #9a6200;
+$severity-low: #13795b;
 
 *::-webkit-scrollbar {
     display: none;
@@ -24,16 +21,15 @@ $severity-low: #3fb950;
 .interview-page {
     width: 100%;
     min-height: 100vh;
-    background-color: $bg-page;
+    background-color: transparent;
     color: $text-primary;
     font-family: $font-stack;
     display: flex;
     align-items: stretch;
-    padding: 1.5rem;
+    padding: 1.35rem;
     box-sizing: border-box;
 }
 
-// ── 3-Column Layout ───────────────────────────────────────────────────────────
 .interview-layout {
     display: flex;
     width: 100%;
@@ -41,8 +37,11 @@ $severity-low: #3fb950;
     margin: 0 auto;
     background-color: $bg-card;
     border: 1px solid $border-color;
-    border-radius: 1rem;
+    border-radius: 1.2rem;
+    box-shadow: 0 24px 65px rgba(24, 45, 68, 0.12);
+    backdrop-filter: blur(9px);
     justify-content: space-between;
+    overflow: hidden;
 }
 
 .interview-divider {
@@ -51,16 +50,20 @@ $severity-low: #3fb950;
     flex-shrink: 0;
 }
 
-// ── Left Nav ─────────────────────────────────────────────────────────────────
 .interview-nav {
     width: 220px;
     flex-shrink: 0;
-    padding: 1.75rem 1rem;
+    padding: 1.5rem 0.9rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     gap: 0.25rem;
 
+    .nav-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
 
 
 
@@ -79,24 +82,26 @@ $severity-low: #3fb950;
         align-items: center;
         gap: 0.6rem;
         width: 100%;
-        padding: 0.65rem 0.75rem;
+        padding: 0.68rem 0.78rem;
         background: none;
         border: none;
-        border-radius: 0.5rem;
+        border-radius: 0.72rem;
         color: $text-muted;
         font-family: $font-stack;
-        font-size: 0.875rem;
+        font-size: 0.86rem;
+        font-weight: 600;
         cursor: pointer;
         text-align: left;
-        transition: background-color 0.15s, color 0.15s;
+        transition: background-color 0.18s, color 0.18s, transform 0.15s;
 
         &:hover {
             background-color: $bg-panel;
             color: $text-primary;
+            transform: translateX(1px);
         }
 
         &--active {
-            background-color: rgba($accent, 0.1);
+            background-color: rgba($accent, 0.12);
             color: $accent;
 
             .interview-nav__icon svg {
@@ -112,13 +117,12 @@ $severity-low: #3fb950;
     }
 }
 
-// ── Center Content ────────────────────────────────────────────────────────────
 .interview-content {
     flex: 1;
-    padding: 1.75rem 2rem;
+    padding: 1.5rem 1.7rem;
     overflow-y: auto;
     min-height: initial;
-    max-height: calc(100vh - 3rem);
+    max-height: calc(100vh - 2.7rem);
     padding-bottom: 5rem;
     align-items: flex-start;
 
@@ -139,11 +143,11 @@ $severity-low: #3fb950;
     align-items: baseline;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
+    padding-bottom: 0.95rem;
     border-bottom: 1px solid $border-color;
 
     h2 {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         font-weight: 700;
         color: $text-primary;
         margin: 0;
@@ -153,35 +157,36 @@ $severity-low: #3fb950;
         font-size: 0.8rem;
         color: $text-muted;
         background-color: $bg-panel;
-        padding: 0.15rem 0.6rem;
+        padding: 0.2rem 0.62rem;
         border-radius: 2rem;
         border: 1px solid $border-color;
+        font-weight: 600;
     }
 }
 
-// ── Question Cards ────────────────────────────────────────────────────────────
 .q-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.85rem;
 }
 
 .q-card {
     background-color: $bg-panel;
     border: 1px solid $border-color;
-    border-radius: 0.6rem;
+    border-radius: 0.85rem;
     overflow: hidden;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
 
     &:hover {
-        border-color: color.adjust($border-color, $lightness: 8%);
+        border-color: color.adjust($border-color, $lightness: -8%);
+        box-shadow: 0 10px 30px rgba(29, 42, 56, 0.09);
     }
 
     &__header {
         display: flex;
         align-items: flex-start;
         gap: 0.75rem;
-        padding: 0.9rem 1rem;
+        padding: 0.95rem 1.05rem;
         cursor: pointer;
         user-select: none;
     }
@@ -193,7 +198,7 @@ $severity-low: #3fb950;
         color: $accent;
         background-color: rgba($accent, 0.1);
         border: 1px solid rgba($accent, 0.2);
-        border-radius: 0.3rem;
+        border-radius: 0.38rem;
         padding: 0.15rem 0.4rem;
         margin-top: 2px;
     }
@@ -201,8 +206,8 @@ $severity-low: #3fb950;
     &__question {
         flex: 1;
         margin: 0;
-        font-size: 0.9rem;
-        font-weight: 500;
+        font-size: 0.92rem;
+        font-weight: 600;
         color: $text-primary;
         line-height: 1.5;
     }
@@ -220,7 +225,7 @@ $severity-low: #3fb950;
     }
 
     &__body {
-        padding: 0 1rem 1rem;
+        padding: 0 1.05rem 1rem;
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
@@ -236,7 +241,7 @@ $severity-low: #3fb950;
         p {
             margin: 0;
             font-size: 0.835rem;
-            color: color.adjust($text-muted, $lightness: 15%);
+            color: color.adjust($text-muted, $lightness: -10%);
             line-height: 1.6;
         }
     }
@@ -251,9 +256,9 @@ $severity-low: #3fb950;
         width: fit-content;
 
         &--intention {
-            color: #a78bfa;
-            background-color: rgba(#a78bfa, 0.1);
-            border: 1px solid rgba(#a78bfa, 0.2);
+            color: #1d4e89;
+            background-color: rgba(#1d4e89, 0.08);
+            border: 1px solid rgba(#1d4e89, 0.22);
         }
 
         &--answer {
@@ -264,14 +269,12 @@ $severity-low: #3fb950;
     }
 }
 
-// ── Road Map ──────────────────────────────────────────────────────────────────
 .roadmap-list {
     display: flex;
     flex-direction: column;
     gap: 0;
     position: relative;
 
-    // vertical timeline line
     &::before {
         content: '';
         position: absolute;
@@ -291,7 +294,6 @@ $severity-low: #3fb950;
     padding: 0.75rem 0 0.75rem 3.5rem;
     position: relative;
 
-    // dot on timeline
     &::before {
         content: '';
         position: absolute;
@@ -300,7 +302,7 @@ $severity-low: #3fb950;
         width: 14px;
         height: 14px;
         border-radius: 50%;
-        background-color: $bg-card;
+        background-color: #ffffff;
         border: 2px solid $accent;
     }
 
@@ -340,7 +342,7 @@ $severity-low: #3fb950;
             align-items: flex-start;
             gap: 0.5rem;
             font-size: 0.845rem;
-            color: color.adjust($text-muted, $lightness: 12%);
+            color: color.adjust($text-muted, $lightness: -8%);
             line-height: 1.5;
         }
     }
@@ -355,11 +357,10 @@ $severity-low: #3fb950;
     }
 }
 
-// ── Right Sidebar ─────────────────────────────────────────────────────────────
 .interview-sidebar {
     width: 240px;
     flex-shrink: 0;
-    padding: 1.75rem 1.25rem;
+    padding: 1.5rem 1.1rem;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
@@ -370,7 +371,6 @@ $severity-low: #3fb950;
     background-color: $border-color;
 }
 
-// Match Score
 .match-score {
     display: flex;
     flex-direction: column;
@@ -396,6 +396,7 @@ $severity-low: #3fb950;
         align-items: center;
         justify-content: center;
         border: 4px solid;
+        background: rgba(255, 255, 255, 0.95);
 
         &.score--high {
             border-color: $severity-low;
@@ -428,10 +429,10 @@ $severity-low: #3fb950;
         font-size: 0.75rem;
         color: $severity-low;
         text-align: center;
+        font-weight: 600;
     }
 }
 
-// Skill Gaps
 .skill-gaps {
     display: flex;
     flex-direction: column;
@@ -477,5 +478,86 @@ $severity-low: #3fb950;
         color: $severity-low;
         background-color: rgba($severity-low, 0.1);
         border-color: rgba($severity-low, 0.25);
+    }
+}
+
+@media (max-width: 1080px) {
+    .interview-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .interview-divider {
+        width: 100%;
+        height: 1px;
+    }
+
+    .interview-nav {
+        width: 100%;
+        gap: 1rem;
+
+        .nav-content {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(140px, 1fr));
+            gap: 0.6rem;
+        }
+
+        &__label {
+            grid-column: 1 / -1;
+        }
+    }
+
+    .interview-sidebar {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1px 1fr;
+        align-items: center;
+    }
+
+    .sidebar-divider {
+        width: 1px;
+        height: 100%;
+    }
+}
+
+@media (max-width: 700px) {
+    .interview-page {
+        padding: 0.8rem;
+    }
+
+    .interview-nav {
+        .nav-content {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .interview-content {
+        padding: 1rem;
+        max-height: none;
+    }
+
+    .content-header {
+        flex-wrap: wrap;
+    }
+
+    .roadmap-day {
+        padding-left: 2.7rem;
+    }
+
+    .roadmap-list::before {
+        left: 18px;
+    }
+
+    .roadmap-day::before {
+        left: 11px;
+    }
+
+    .interview-sidebar {
+        grid-template-columns: 1fr;
+
+        .sidebar-divider {
+            width: 100%;
+            height: 1px;
+        }
     }
 }
