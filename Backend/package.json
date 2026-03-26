@@ -21,6 +21,7 @@
     "mongoose": "^9.2.1",
     "multer": "^2.0.2",
     "pdf-parse": "^2.4.5",
+    "pdfkit": "^0.17.2",
     "puppeteer": "^24.37.5",
     "zod": "^3.25.76",
     "zod-to-json-schema": "^3.25.1"

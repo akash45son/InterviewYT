@@ -2,6 +2,7 @@ const { GoogleGenAI } = require("@google/genai")
 const { z } = require("zod")
 const { zodToJsonSchema } = require("zod-to-json-schema")
 const puppeteer = require("puppeteer")
+const PDFDocument = require("pdfkit")
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
@@ -63,7 +64,9 @@ async function generatePdfFromHtml(htmlContent) {
         args: [
             "--no-sandbox",
             "--disable-setuid-sandbox",
-            "--disable-dev-shm-usage"
+            "--disable-dev-shm-usage",
+            "--no-zygote",
+            "--single-process"
         ],
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined
     })
@@ -82,6 +85,67 @@ async function generatePdfFromHtml(htmlContent) {
     await browser.close()
 
     return pdfBuffer
+}
+
+function parseModelJsonResponse(response) {
+    if (response && typeof response.parsed === "object" && response.parsed !== null) {
+        return response.parsed
+    }
+
+    const text = typeof response?.text === "function" ? response.text() : response?.text
+
+    if (!text || typeof text !== "string") {
+        throw new Error("Model response does not contain JSON text")
+    }
+
+    const sanitized = text.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim()
+
+    return JSON.parse(sanitized)
+}
+
+function stripHtml(value = "") {
+    return value
+        .replace(/<style[\s\S]*?<\/style>/gi, "")
+        .replace(/<script[\s\S]*?<\/script>/gi, "")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&nbsp;/gi, " ")
+        .replace(/&amp;/gi, "&")
+        .replace(/\s+/g, " ")
+        .trim()
+}
+
+function generateFallbackPdf({ resume, selfDescription, jobDescription, aiGeneratedHtml }) {
+    return new Promise((resolve, reject) => {
+        const doc = new PDFDocument({ margin: 40, size: "A4" })
+        const chunks = []
+
+        doc.on("data", (chunk) => chunks.push(chunk))
+        doc.on("end", () => resolve(Buffer.concat(chunks)))
+        doc.on("error", reject)
+
+        doc.fontSize(20).text("Tailored Resume Draft", { align: "left" })
+        doc.moveDown(0.8)
+        doc.fontSize(11).fillColor("#333").text("Generated using available profile and job details.")
+        doc.moveDown()
+
+        const sections = [
+            { heading: "Professional Summary", content: selfDescription || "Not provided" },
+            { heading: "Experience & Skills", content: stripHtml(aiGeneratedHtml) || resume || "Not provided" },
+            { heading: "Target Job Notes", content: jobDescription || "Not provided" }
+        ]
+
+        sections.forEach(({ heading, content }) => {
+            doc.fontSize(14).fillColor("#111").text(heading)
+            doc.moveDown(0.3)
+            doc.fontSize(11).fillColor("#222").text(content, {
+                align: "left",
+                lineGap: 3
+            })
+            doc.moveDown()
+        })
+
+        doc.end()
+    })
 }
 
 async function generateResumePdf({ resume, selfDescription, jobDescription }) {
@@ -103,21 +167,38 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
                         The resume should not be so lengthy, it should ideally be 1-2 pages long when converted to PDF. Focus on quality rather than quantity and make sure to include all the relevant information that can increase the candidate's chances of getting an interview call for the given job description.
                     `
 
-    const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: prompt,
-        config: {
-            responseMimeType: "application/json",
-            responseSchema: zodToJsonSchema(resumePdfSchema),
+    let aiGeneratedHtml = ""
+
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: zodToJsonSchema(resumePdfSchema),
+            }
+        })
+
+        const jsonContent = parseModelJsonResponse(response)
+        aiGeneratedHtml = typeof jsonContent?.html === "string" ? jsonContent.html : ""
+    } catch (error) {
+        console.error("Failed to generate resume HTML from AI:", error)
+    }
+
+    if (aiGeneratedHtml) {
+        try {
+            return await generatePdfFromHtml(aiGeneratedHtml)
+        } catch (error) {
+            console.error("Failed to render AI HTML with Puppeteer, using fallback PDF:", error)
         }
+    }
+
+    return generateFallbackPdf({
+        resume,
+        selfDescription,
+        jobDescription,
+        aiGeneratedHtml
     })
-
-
-    const jsonContent = JSON.parse(response.text)
-
-    const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
-
-    return pdfBuffer
 
 }
 
